@@ -71,7 +71,7 @@ class TestUpdateGenre:
         mock_genre_repo.get_by_id.return_value = None
         use_case = UpdateGenre(mock_genre_repo, mock_category_repository_with_categories)
         
-        with pytest.raises(GenreNotFound, match="Genre with .* not found!") as exec_info:
+        with pytest.raises(GenreNotFound, match="Genre with id .* was not found!") as exec_info:
             use_case.execute(UpdateGenre.Input(uuid.uuid4()))
         
         mock_genre_repo.update.assert_not_called()

@@ -20,7 +20,7 @@ class UpdateGenre:
         genre = self.repo.get_by_id(input.id)
         
         if genre is None:
-            raise GenreNotFound(f"Genre with {input.id} not found!")
+            raise GenreNotFound(f"Genre with id {input.id} was not found!")
         
         try:
             genre.clear_category()
