@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from uuid import UUID
+from src.core._shared.listEntity import ListEntity, ListEntityResponse, ListPaginationInput
 from src.core.castMember.application.use_cases.castMember_repository import CastMemberRepository
 from src.core.castMember.domain.castMember import CastMemberTypeEnum
 
@@ -9,29 +10,21 @@ class CastMemberOutput:
     name: str
     type: CastMemberTypeEnum
     
-class ListCastMember:
+class ListCastMember(ListEntity):
     def __init__(self, repo = CastMemberRepository):
         self.repo = repo
-    
-    @dataclass
-    class Input:
-        pass
-    
-    @dataclass
-    class Output:
-        data: list[CastMemberOutput]
         
-    @dataclass
-    class Output:
-        data: list[CastMemberOutput] 
+    def execute(self, input: ListPaginationInput)-> ListEntityResponse[CastMemberOutput]:
+        castMembers = self.repo.list()
         
-    def execute(self)->Output:
-        return self.Output(
-            data = [
+        sorted_castMember = sorted(
+            [
                 CastMemberOutput(
-                id= cast_member.id,
-                name= cast_member.name,
-                type= cast_member.type)
-                for cast_member in self.repo.list()
-            ]
+                id= castMember.id,
+                name= castMember.name,
+                type= castMember.type)
+                for castMember in castMembers
+            ], key=lambda castMember: getattr(castMember, input.order_by)
         )
+        
+        return self.paginate_data(input.current_page, sorted_castMember)

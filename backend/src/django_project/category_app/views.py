@@ -2,9 +2,10 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.request import Request
 from rest_framework import status
-from core.category.application.use_cases.list_category import ListCategory, ListCategoryRequest
+from core.category.application.use_cases.list_category import ListCategory
 from django_project.category_app.repository import DjangoORMCategoryRepository
 from core.category.application.use_cases.create_category import CreateCategory, CreateCategoryRequest
+from src.core._shared.listEntity import ListPaginationInput
 from src.core.category.application.use_cases.delete_repository import DeleteCategory, DeleteCategoryRequest
 from src.core.category.application.use_cases.exceptions import CategoryNotFound
 from core.category.application.use_cases.get_category import GetCategory, GetCategoryRequest
@@ -13,7 +14,10 @@ from django_project.category_app.serializers import CreateCategoryRequestSeriali
 
 class CategoryViewSet(viewsets.ViewSet):
     def list(self, request: Request)-> Response:
-        input = ListCategoryRequest()
+        order_by = request.query_params.get("order_by", "name")
+        page = request.query_params.get("page", 1)
+        
+        input = ListPaginationInput(order_by, page)
         use_case = ListCategory(DjangoORMCategoryRepository())
         output = use_case.execute(input)
         

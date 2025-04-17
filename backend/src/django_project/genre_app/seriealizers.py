@@ -14,6 +14,16 @@ class GenreOutputSerializer(serializers.ModelSerializer):
 class ListGenreOutputSerializer(serializers.Serializer):
     data = GenreOutputSerializer(many=True)
     
+    def to_representation(self, instance):
+        return {
+            "data": GenreOutputSerializer(instance.data, many=True).data,
+            "meta":{
+            "current_page": instance.meta.current_page,
+            "per_page": instance.meta.per_page,
+            "total": instance.meta.total
+            }        
+        }
+    
 class SetField(serializers.ListField):
     def to_internal_value(self, data):
         return set(super().to_internal_value(data))

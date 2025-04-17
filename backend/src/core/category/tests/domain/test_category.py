@@ -9,7 +9,7 @@ class TestCategory:
             Category()
             
     def test_name_should_have_less_255_characteres(self):
-        with pytest.raises(ValueError, match="Name should not be longer than 255 characters"):
+        with pytest.raises(ValueError, match="Name should not exceed 255 characters"):
             Category("a"*256)
             
     def test_name_should_be_truthy(self):
@@ -46,10 +46,22 @@ class TestUpdateCategory:
         assert category.description == "Series in general"
             
     def test_name_should_not_update_with_more_255_characteres(self):
-        with pytest.raises(ValueError, match="Name should not be longer than 255 characters"):
+        with pytest.raises(ValueError, match="Name should not exceed 255 characters"):
             category = Category("Movies", description="Movies in general")
             
             category.update_category(name="a"*256, description="Series in general")
+            
+    def test_description_should_not_update_with_more_1024_characteres(self):
+        with pytest.raises(ValueError, match="Description should not exceed 1024 characters"):
+            category = Category("Movies", description="Movies in general")
+            
+            category.update_category(name="Series", description="a"*1025)
+            
+    def test_description_and_name_should_not_update_when_invalid(self):
+        with pytest.raises(ValueError, match="^Name should not be empty\nDescription should not exceed 1024 characters$"):
+            category = Category("Movies", description="Movies in general")
+            
+            category.update_category(name="", description="a"*1025)
             
     def test_name_should_not_update_when_falsy(self):
         with pytest.raises(ValueError, match="Name should not be empty"):

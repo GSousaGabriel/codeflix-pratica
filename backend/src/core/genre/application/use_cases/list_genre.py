@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from uuid import UUID
+from src.core._shared.listEntity import ListEntity, ListEntityResponse, ListPaginationInput
 from src.core.genre.application.use_cases.genre_repository import GenreRepository
 
 @dataclass
@@ -9,23 +10,14 @@ class GenreOutput:
     is_active: bool
     categories_ids: set[UUID]
 
-class ListGenre:
+class ListGenre(ListEntity):
     def __init__(self, repo=GenreRepository):
-        self.repo = repo
-        
-    @dataclass
-    class Input:
-        pass
+        self.repo = repo    
     
-    @dataclass
-    class Output:
-        data: list[GenreOutput]      
-    
-    def execute(self)-> Output:
+    def execute(self, input: ListPaginationInput)-> ListEntityResponse[GenreOutput]:
         genres = self.repo.list()
-        
-        return self.Output(
-            data=[
+        sorted_genre = sorted(
+            [
                 GenreOutput(
                     id=genre.id,
                     name=genre.name,
@@ -33,5 +25,7 @@ class ListGenre:
                     categories_ids={category for category in genre.categories_ids}
                 )
                 for genre in genres
-            ]
+            ], key= lambda genre: getattr(genre, input.order_by)
         )
+        
+        return self.paginate_data(input.current_page, sorted_genre)

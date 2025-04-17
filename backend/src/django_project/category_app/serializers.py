@@ -8,8 +8,24 @@ class  CategoryResponseSerializer(serializers.ModelSerializer):
         model = Category
         fields = "__all__"
         
+class ListOutputMetaSerializer(serializers.Serializer):
+    current_page = serializers.IntegerField()
+    per_page = serializers.IntegerField()
+    total = serializers.IntegerField()
+        
 class  ListCategoryResponseSerializer(serializers.Serializer):
     data = CategoryResponseSerializer(many=True)
+    meta = ListOutputMetaSerializer()
+    
+    def to_representation(self, instance):
+        return {
+                "data": CategoryResponseSerializer(instance.data, many=True).data,
+                "meta": {
+                    "current_page": instance.meta.current_page,
+                    "per_page": instance.meta.per_page,
+                    "total": instance.meta.total
+                }
+        }
 
 class  RetrieveCategoryRequestSerializer(serializers.Serializer):
     id = serializers.UUIDField()

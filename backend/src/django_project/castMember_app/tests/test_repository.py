@@ -3,6 +3,7 @@ import uuid
 import pytest
 from core.castMember.application.use_cases.list_castMember import ListCastMember
 from django_project.castMember_app.repository import DjangoORMCastMemberRepository
+from src.core._shared.listEntity import ListPaginationInput, MetaPaginationOutput
 from src.core.castMember.application.use_cases.create_castMember import CreateCastMember
 from src.core.castMember.application.use_cases.delete_castMember import DeleteCastMember
 from src.core.castMember.application.use_cases.exceptions import CastMemberNotFound, InvalidCastMember
@@ -24,19 +25,31 @@ class Testlist:
                 type="ACTOR",
             )
             
+            input = ListPaginationInput()
             use_case = ListCastMember(castMember_repo)
-            response = use_case.execute()
+            response = use_case.execute(input)
             
             assert len(response.data) == 1
+            assert response.meta == MetaPaginationOutput(
+                current_page = 1,
+                per_page = 2,
+                total = 1
+            )
         
     def test_list_empty_castMember(
             self,
             castMember_repo
         ):
+            input = ListPaginationInput()
             use_case = ListCastMember(castMember_repo)
-            response = use_case.execute()
+            response = use_case.execute(input)
             
             assert len(response.data) == 0
+            assert response.meta == MetaPaginationOutput(
+                current_page = 1,
+                per_page = 2,
+                total = 0
+            )
 
 @pytest.mark.django_db
 class TestCreate:

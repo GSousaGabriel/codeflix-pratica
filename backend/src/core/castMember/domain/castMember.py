@@ -1,17 +1,15 @@
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import StrEnum
-from uuid import UUID
-import uuid
+from src.core._shared.entity import Entity
 
 class CastMemberTypeEnum(StrEnum):
     ACTOR = "ACTOR"
     DIRECTOR = "DIRECTOR"
 
 @dataclass
-class CastMember:
+class CastMember(Entity):
     name: str
     type: CastMemberTypeEnum
-    id: UUID = field(default_factory=uuid.uuid4)
     
     def __post_init__(self):
         self.validate()
@@ -26,18 +24,18 @@ class CastMember:
         
     def validate(self):
         if len(self.name) > 255:
-            raise ValueError("Name should not be longer than 255 characters")
+            self.notification.add_error("Name should not be longer than 255 characters")
         elif not self.name:
-            raise ValueError("Name should not be empty")
+            self.notification.add_error("Name should not be empty")
         
         if self.type not in CastMemberTypeEnum:
-            raise ValueError("Type should be either ACTOR or DIRECTOR")
+            self.notification.add_error("Type should be either ACTOR or DIRECTOR")
+            
+        if self.notification.has_errors:
+            raise ValueError(self.notification.messages)
         
     def __str__(self):
         return f"{self.name} - ({self.type})"
     
     def __repr__(self):
         return f"<Genre {self.name} ({self.id})>"
-    
-    def __eq__(self, other):
-        return (self.id == other.id) and isinstance(other, CastMember)

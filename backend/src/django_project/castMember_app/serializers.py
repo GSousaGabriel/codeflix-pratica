@@ -11,6 +11,17 @@ class CastMemberOutputSerializer(serializers.ModelSerializer):
         
 class ListCastMemberOutputSerializer(serializers.Serializer):
     data = CastMemberOutputSerializer(many=True)
+    meta = serializers.DictField()
+    
+    def to_representation(self, instance):
+        return {
+            "data": CastMemberOutputSerializer(instance.data, many=True).data,
+            "meta": {
+                "current_page": instance.meta.current_page,
+                "per_page": instance.meta.per_page,
+                "total": instance.meta.total
+            }
+        }
 
 class CreateCastMemberInputSerializer(serializers.ModelSerializer):
     class Meta:

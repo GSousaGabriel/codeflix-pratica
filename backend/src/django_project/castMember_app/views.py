@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.request import Request
 
+from src.core._shared.listEntity import ListPaginationInput
 from src.core.castMember.application.use_cases.create_castMember import CreateCastMember
 from src.core.castMember.application.use_cases.delete_castMember import DeleteCastMember
 from src.core.castMember.application.use_cases.exceptions import CastMemberNotFound, InvalidCastMember
@@ -12,8 +13,12 @@ from src.core.castMember.application.use_cases.update_castMember import UpdateCa
 
 class CastMemberViewSet(viewsets.ViewSet):
     def list(self, request: Request) -> Response:
+        page = request.query_params.get("page", 1)
+        order_by = request.query_params.get("order", "id")
+        
         use_case = ListCastMember(DjangoORMCastMemberRepository())
-        response = use_case.execute()
+        input = ListPaginationInput(order_by, current_page=page)
+        response = use_case.execute(input)
         serializer = ListCastMemberOutputSerializer(response)
 
         return Response(status=status.HTTP_200_OK, data=serializer.data)
