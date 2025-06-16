@@ -2,7 +2,9 @@ import uuid
 import pytest
 from rest_framework.test import APIClient
 from django_project.category_app.repository import DjangoORMCategoryRepository
+from src.core._shared.tests.authentication.jwt_generator import JwtGenerator
 from src.core.category.domain.category import Category
+import os
 
 @pytest.fixture
 def category_movie():
@@ -16,18 +18,34 @@ def category_serie():
 def category_repo() -> DjangoORMCategoryRepository:
     return DjangoORMCategoryRepository()
 
+@pytest.fixture
+def encoded_token() -> str:
+    tokenGenerator = JwtGenerator()
+    tokenGenerator.encode_jwt()
+    return tokenGenerator.encoded_jwt
+
+@pytest.fixture
+def client(encoded_token: str) -> str:
+    return APIClient(headers={"Authorization": f"Bearer {encoded_token}"})
+
+
+@pytest.fixture(autouse=True, scope="session")
+def use_test_public_key():
+    os.environ["AUTH_PUBLIC_KEY"] = os.getenv("TEST_PUBLIC_KEY")
+    
 @pytest.mark.django_db
 class TestListCategoryAPI:
     def test_list_categories(
             self,
             category_movie: Category,
             category_serie: Category,
-            category_repo: DjangoORMCategoryRepository   
+            category_repo: DjangoORMCategoryRepository,
+            client: APIClient
         ) -> None:        
         category_repo.save(category_movie)
         category_repo.save(category_serie)
         url = "/api/categories/?page=1&order=name"
-        response = APIClient().get(url)
+        response = client.get(url)
         
         expected_data =  [
             {
@@ -54,9 +72,11 @@ class TestListCategoryAPI:
 
 @pytest.mark.django_db
 class TestRetrieveAPI:
-    def test_return_error_when_id_is_invalid(self) -> None: 
+    def test_return_error_when_id_is_invalid(
+            self,
+            client: APIClient) -> None: 
         url = "/api/categories/123/"
-        response = APIClient().get(url)
+        response = client.get(url)
         
         assert response.status_code == 400
         
@@ -64,12 +84,13 @@ class TestRetrieveAPI:
             self,
             category_movie: Category,
             category_serie: Category,
-            category_repo: DjangoORMCategoryRepository   
+            category_repo: DjangoORMCategoryRepository, 
+            client: APIClient
         ) -> None:        
         category_repo.save(category_movie)
         category_repo.save(category_serie)
         url = f"/api/categories/{category_movie.id}/"
-        response = APIClient().get(url)
+        response = client.get(url)
         
         expected_data = {
             "id": str(category_movie.id),
@@ -81,17 +102,21 @@ class TestRetrieveAPI:
         assert response.status_code == 200
         assert response.data["data"] == expected_data
     
-    def test_return_error_when_id_is_not_found(self) -> None: 
+    def test_return_error_when_id_is_not_found(
+        self,
+        client: APIClient) -> None: 
         url = f"/api/categories/{uuid.uuid4()}/"
-        response = APIClient().get(url)
+        response = client.get(url)
         
         assert response.status_code == 404
         
 @pytest.mark.django_db
 class TestCreateAPI:
-    def test_when_payload_is_invalid(self) -> None: 
+    def test_when_payload_is_invalid(
+        self,
+        client: APIClient) -> None: 
         url = "/api/categories/"
-        response = APIClient().post(
+        response = client.post(
             url,
             data={"name": "", "description": "Movie category"}
         )
@@ -101,10 +126,11 @@ class TestCreateAPI:
         
     def test_when_payload_is_valid(
             self,
-            category_repo: DjangoORMCategoryRepository   
+            category_repo: DjangoORMCategoryRepository,
+            client: APIClient
         ) -> None:        
         url = f"/api/categories/"
-        response = APIClient().post(
+        response = client.post(
             url,
             data = {"name": "Movie", "description": "Movie category"}
             )
@@ -116,17 +142,21 @@ class TestCreateAPI:
             description = "Movie category"
         )]
     
-    def test_return_error_when_id_is_invalid(self) -> None: 
+    def test_return_error_when_id_is_invalid(
+            self,
+            client: APIClient) -> None: 
         url = f"/api/categories/{uuid.uuid4()}/"
-        response = APIClient().get(url)
+        response = client.get(url)
         
         assert response.status_code == 404
         
 @pytest.mark.django_db
 class TestUpdateAPI:
-    def test_return_error_when_upload_is_invalid(self) -> None: 
+    def test_return_error_when_upload_is_invalid(
+        self,
+        client: APIClient) -> None: 
         url = "/api/categories/123/"
-        response = APIClient().put(
+        response = client.put(
             url,
             data={"name": "", "description": "Movie category"})
         
@@ -140,11 +170,12 @@ class TestUpdateAPI:
     def test_update_successfully_when_exists(
             self,
             category_movie: Category,
-            category_repo: DjangoORMCategoryRepository   
+            category_repo: DjangoORMCategoryRepository,
+            client: APIClient
         ) -> None:        
         category_repo.save(category_movie)
         url = f"/api/categories/{category_movie.id}/"
-        response = APIClient().put(
+        response = client.put(
             url,
             data={"name": "Serie", "description": "Serie category", "is_active": True}
             )
@@ -155,9 +186,11 @@ class TestUpdateAPI:
         assert category_repo.list()[0].description == "Serie category"
         assert category_repo.list()[0].is_active == True
     
-    def test_return_error_when_category_is_not_found(self) -> None: 
+    def test_return_error_when_category_is_not_found(
+        self,
+        client: APIClient) -> None: 
         url = f"/api/categories/{uuid.uuid4()}/"
-        response = APIClient().put(
+        response = client.put(
             url,
             data={"name": "Serie", "description": "Serie category", "is_active": True}
         )
@@ -166,9 +199,11 @@ class TestUpdateAPI:
 
 @pytest.mark.django_db
 class TestPartialUpdateAPI:
-    def test_return_error_when_upload_is_invalid(self) -> None: 
+    def test_return_error_when_upload_is_invalid(
+        self,
+        client: APIClient) -> None: 
         url = "/api/categories/123/"
-        response = APIClient().patch(
+        response = client.patch(
             url,
             data={"description": "Movie category"})
         
@@ -180,11 +215,12 @@ class TestPartialUpdateAPI:
     def test_partially_update_successfully_when_exists(
             self,
             category_movie: Category,
-            category_repo: DjangoORMCategoryRepository   
+            category_repo: DjangoORMCategoryRepository,
+            client: APIClient   
         ) -> None:        
         category_repo.save(category_movie)
         url = f"/api/categories/{category_movie.id}/"
-        response = APIClient().patch(
+        response = client.patch(
             url,
             data={"description": "Serie category"}
             )
@@ -195,9 +231,11 @@ class TestPartialUpdateAPI:
         assert category_repo.list()[0].description == "Serie category"
         assert category_repo.list()[0].is_active == True
     
-    def test_return_error_when_category_is_not_found(self) -> None: 
+    def test_return_error_when_category_is_not_found(
+        self,
+        client: APIClient) -> None: 
         url = f"/api/categories/{uuid.uuid4()}/"
-        response = APIClient().patch(
+        response = client.patch(
             url,
             data={"name": "Serie"}
         )
@@ -206,27 +244,32 @@ class TestPartialUpdateAPI:
 
 @pytest.mark.django_db
 class TestDeleteAPI:
-    def test_return_error_when_id_is_invalid(self) -> None: 
+    def test_return_error_when_id_is_invalid(
+        self,
+        client: APIClient) -> None: 
         url = "/api/categories/123/"
-        response = APIClient().delete(url)
+        response = client.delete(url)
         
         assert response.status_code == 400
         
     def test_return_category_when_exists(
             self,
             category_movie: Category,
-            category_repo: DjangoORMCategoryRepository   
+            category_repo: DjangoORMCategoryRepository,
+            client: APIClient   
         ) -> None:        
         category_repo.save(category_movie)
         url = f"/api/categories/{category_movie.id}/"
-        response = APIClient().delete(url)
+        response = client.delete(url)
         
         assert response.status_code == 200
         assert len(category_repo.list()) == 0
     
-    def test_return_error_when_category_is_not_found(self) -> None: 
+    def test_return_error_when_category_is_not_found(
+        self,
+        client: APIClient) -> None: 
         url = f"/api/categories/{uuid.uuid4()}/"
-        response = APIClient().delete(url)
+        response = client.delete(url)
         
         assert response.status_code == 404
     

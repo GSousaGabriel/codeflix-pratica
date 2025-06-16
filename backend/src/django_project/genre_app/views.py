@@ -11,8 +11,10 @@ from django_project.genre_app.repository import DjangoORMGenreRepository
 from django_project.genre_app.seriealizers import CreateGenreInputSerializer, CreateGenreOutputSerializer, DeleteGenreInputSerializer, ListGenreOutputSerializer, UpdateGenreInputSerializer
 from django_project.category_app.repository import DjangoORMCategoryRepository
 from src.core.genre.application.use_cases.update_genre import UpdateGenre
+from src.django_project.permissions import IsAuthenticated
 
 class GenreViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
     def list(self, request: Request)-> Response:
         page = request.query_params.get("page", 1)
         order = request.query_params.get("order", "id")

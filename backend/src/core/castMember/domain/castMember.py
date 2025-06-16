@@ -38,4 +38,4 @@ class CastMember(Entity):
         return f"{self.name} - ({self.type})"
     
     def __repr__(self):
-        return f"<Genre {self.name} ({self.id})>"
+        return f"<CastMember {self.name} ({self.id})>"

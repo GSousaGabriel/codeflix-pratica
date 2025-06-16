@@ -5,7 +5,6 @@ import pytest
 from core.genre.domain.genre import Genre
 from core.video.domain.video import Video
 from django_project.video_app.repository import DjangoORMVideoRepository
-from django_project.genre_app.repository import DjangoORMGenreRepository
 
 @pytest.fixture
 def video_repo() -> DjangoORMVideoRepository:
@@ -17,26 +16,48 @@ class TestVideo:
         self,
         video_repo
     ):
-        video = Video("A video", "A video description", 2000, 123.23, False, "ER", set(), set(), set())
+        video = Video(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
         video_repo.save(video)
         
         saved_video = video_repo.video_model.objects.first()
         
         assert isinstance(saved_video.id, UUID)
-        assert saved_video.title == "A video"
+        assert saved_video.title == "A movie"
         assert video_repo.video_model.objects.count() == 1
         
     def test_video_get_by_id(
         self,
         video_repo
     ):
-        video = Video("A video", "A video description", 2000, 123.23, False, "ER", set(), set(), set())
+        video = Video(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
         video_repo.save(video)
         
         saved_video = video_repo.get_by_id(video.id)
         
         assert saved_video is not None
-        assert saved_video.title == "A video"
+        assert saved_video.title == "A movie"
         
     def test_video_get_by_id_non_existent_id(
         self,
@@ -50,7 +71,18 @@ class TestVideo:
         self,
         video_repo
     ):
-        video = Video("A video", "A video description", 2000, 123.23, False, "ER", set(), set(), set())
+        video = Video(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
         video_repo.save(video)
         video_repo.delete(video.id)
         
@@ -60,7 +92,18 @@ class TestVideo:
         self,
         video_repo
     ):
-        video = Video("A video", "A video description", 2000, 123.23, False, "ER", set(), set(), set())
+        video = Video(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
         video_repo.save(video)
         
         video.title = "A serie"
@@ -77,8 +120,30 @@ class TestVideo:
         self,
         video_repo
     ):
-        video = Video("An action video", "An action video description", 2000, 123.23, False, "ER", set(), set(), set())
-        video2 = Video("A drama video", "A drama description", 2000, 123.23, False, "ER", set(), set(), set())
+        video = Video(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
+        video2 = Video(
+            title = "A drama movie", 
+            description="Drama movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
         video_repo.save(video)
         
         video2.title = "A romance video"
@@ -88,15 +153,37 @@ class TestVideo:
         video_video = video_repo.video_model.objects.first()
         
         assert updated_video is None
-        assert video_video.title == "An action video"
-        assert video_video.description == "An action video description"
+        assert video_video.title == "A movie"
+        assert video_video.description == "Tense movie descripion"
         
     def test_get_all_videos(
         self,
         video_repo
     ):
-        video = Video("An action video", "An action video description", 2000, 123.23, False, "ER", set(), set(), set())
-        video2 = Video("A drama video", "A drama description", 2000, 123.23, False, "ER", set(), set(), set())
+        video = Video(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
+        video2 = Video(
+            title = "A drama movie", 
+            description="Drama movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=False,
+            opened= False,
+            rating="ER",
+            genres=set(),
+            cast_members=set(),
+            categories=set()
+        )
         video_repo.save(video)
         video_repo.save(video2)
         

@@ -1,6 +1,8 @@
 import uuid
 import pytest
+import os
 from rest_framework.test import APIClient
+from src.core._shared.tests.authentication.jwt_generator import JwtGenerator
 from src.core.category.domain.category import Category
 from src.core.genre.domain.genre import Genre
 from django_project.category_app.repository import DjangoORMCategoryRepository
@@ -13,6 +15,20 @@ def category_documentary()-> Category:
 @pytest.fixture
 def category_movie()-> Category:
     return Category(name="Movie")
+
+@pytest.fixture
+def encoded_token() -> str:
+    token_generator = JwtGenerator()
+    token_generator.encode_jwt()
+    return token_generator.encoded_jwt
+
+@pytest.fixture
+def client(encoded_token: str) -> APIClient:
+    return APIClient(headers={"Authorization": f"Bearer {encoded_token}"})
+
+@pytest.fixture(autouse=True, scope="session")
+def use_test_public_key():
+    os.environ["AUTH_PUBLIC_KEY"] = os.getenv("TEST_PUBLIC_KEY")
 
 @pytest.fixture
 def category_repo(category_documentary, category_movie)-> DjangoORMCategoryRepository:
@@ -42,13 +58,14 @@ class TestListAPI:
         category_repo,
         genre_repo,
         genre_drama,
-        genre_romance
+        genre_romance, 
+        client
     ):
         genre_repo.save(genre_romance)
         genre_repo.save(genre_drama)
         
         url = "/api/genres/?order=name"
-        response = APIClient().get(url)
+        response = client.get(url)
         
         assert response.status_code == 200
         assert response.data["data"][0]["id"] == str(genre_drama.id)
@@ -75,7 +92,8 @@ class TestCreateAPI:
         category_documentary,
         category_movie,
         category_repo,
-        genre_repo
+        genre_repo, 
+        client
     ):
         url = "/api/genres/"
         data = {
@@ -83,7 +101,7 @@ class TestCreateAPI:
             "categories_ids": [str(category_documentary.id), str(category_movie.id)],
         }
         
-        response = APIClient().post(url, data=data)
+        response = client.post(url, data=data)
         
         assert response.status_code == 201
         assert response.data["id"] is not None
@@ -98,7 +116,8 @@ class TestCreateAPI:
         
     def test_do_not_create_genre_invalid_category(
         self,
-        category_repo
+        category_repo, 
+        client
     ):
         url = "/api/genres/"
         category_id = uuid.uuid4()
@@ -107,7 +126,7 @@ class TestCreateAPI:
             "categories_ids": [str(category_id)],
         }
         
-        response = APIClient().post(url, data=data)
+        response = client.post(url, data=data)
         
         assert response.status_code == 400
         assert response.data["error"] is not None
@@ -115,7 +134,8 @@ class TestCreateAPI:
     def test_do_not_create_genre_invalid_genre_data(
         self,
         category_documentary,
-        category_repo
+        category_repo, 
+        client
     ):
         url = "/api/genres/"
         data = {
@@ -123,7 +143,7 @@ class TestCreateAPI:
             "categories_ids": [str(category_documentary.id)],
         }
         
-        response = APIClient().post(url, data=data)
+        response = client.post(url, data=data)
         
         assert response.status_code == 400
         assert response.data == {"name": ["This field may not be blank."]}
@@ -134,12 +154,13 @@ class TestDeleteAPI:
         self,
         category_repo,
         genre_drama,
-        genre_repo
+        genre_repo, 
+        client
     ):
         genre_repo.save(genre_drama)
         url = f"/api/genres/{genre_drama.id}/"
         
-        response = APIClient().delete(url)
+        response = client.delete(url)
         
         assert response.status_code == 200
         
@@ -147,17 +168,21 @@ class TestDeleteAPI:
         
         assert genre is None
         
-    def test_delete_fail_genre_not_found(self):
+    def test_delete_fail_genre_not_found(
+        self,
+        client):
         url = f"/api/genres/{uuid.uuid4()}/"
         
-        response = APIClient().delete(url)
+        response = client.delete(url)
         
         assert response.status_code == 404
         
-    def test_delete_fail_genre_id_not_valid(self):
+    def test_delete_fail_genre_id_not_valid(
+        self,
+        client):
         url = "/api/genres/1/"
         
-        response = APIClient().delete(url)
+        response = client.delete(url)
         
         assert response.status_code == 400
         
@@ -168,7 +193,8 @@ class TestUpdateAPI:
         category_movie,
         category_repo,
         genre_drama,
-        genre_repo
+        genre_repo,
+        client
     ):
         genre_repo.save(genre_drama)
               
@@ -179,7 +205,7 @@ class TestUpdateAPI:
             "categories_ids": [str(category_movie.id)],
         }
         
-        response = APIClient().put(url, data=data)
+        response = client.put(url, data=data)
         
         assert response.status_code == 204
         
@@ -194,7 +220,8 @@ class TestUpdateAPI:
     def test_when_request_data_is_invalid_then_return_400(
         self,
         genre_repo,
-        genre_drama
+        genre_drama,
+        client
     ):
         genre_repo.save(genre_drama)
         url = f"/api/genres/{genre_drama.id}/"
@@ -202,7 +229,7 @@ class TestUpdateAPI:
             "name": "",
         }
         
-        response = APIClient().put(url, data=data)
+        response = client.put(url, data=data)
         
         assert response.status_code == 400
         assert response.data == {
@@ -215,7 +242,8 @@ class TestUpdateAPI:
         self,
         category_repo,
         genre_drama,
-        genre_repo
+        genre_repo,
+        client
     ):
         genre_repo.save(genre_drama)
         url = f"/api/genres/{genre_drama.id}/"
@@ -225,12 +253,14 @@ class TestUpdateAPI:
             "categories_ids": [str(uuid.uuid4())],
         }
         
-        response = APIClient().put(url, data=data)
+        response = client.put(url, data=data)
         
         assert response.status_code == 400
         assert response.data == {"error": "Some of the categories could no be found!"}
         
-    def test_when_genre_does_not_exist_then_return_404(self):
+    def test_when_genre_does_not_exist_then_return_404(
+        self,
+        client):
         test_id = uuid.uuid4()
         url = f"/api/genres/{test_id}/"
         data = {
@@ -239,12 +269,14 @@ class TestUpdateAPI:
             "categories_ids": [str(uuid.uuid4())],
         }
         
-        response = APIClient().put(url, data=data)
+        response = client.put(url, data=data)
         
         assert response.status_code == 404
         assert response.data == {"error": f"Genre with id {test_id} was not found!"}
         
-    def test_when_id_is_not_valid_uuid(self):
+    def test_when_id_is_not_valid_uuid(
+        self,
+        client):
         url = "/api/genres/1/"
         data = {
             "name": "Action",
@@ -252,6 +284,6 @@ class TestUpdateAPI:
             "categories_ids": [str(uuid.uuid4())],
         }
         
-        response = APIClient().put(url, data=data)
+        response = client.put(url, data=data)
         
         assert response.status_code == 400

@@ -10,8 +10,10 @@ from src.core.castMember.application.use_cases.list_castMember import ListCastMe
 from django_project.castMember_app.repository import DjangoORMCastMemberRepository
 from django_project.castMember_app.serializers import CreateCastMemberInputSerializer, CreateCastMemberOutputSerializer, ListCastMemberOutputSerializer, DeleteCastMemberInputSerializer, UpdateCastMemberInputSerializer
 from src.core.castMember.application.use_cases.update_castMember import UpdateCastMember
+from src.django_project.permissions import IsAuthenticated
 
 class CastMemberViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
     def list(self, request: Request) -> Response:
         page = request.query_params.get("page", 1)
         order_by = request.query_params.get("order", "id")

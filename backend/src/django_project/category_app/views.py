@@ -11,8 +11,10 @@ from src.core.category.application.use_cases.exceptions import CategoryNotFound
 from core.category.application.use_cases.get_category import GetCategory, GetCategoryRequest
 from core.category.application.use_cases.update_category import UpdateCategory, UpdateCategoryRequest
 from django_project.category_app.serializers import CreateCategoryRequestSerializer, CreateCategoryResponseSerializer, DeleteCategoryRequestSerializer, ListCategoryResponseSerializer, RetrieveCategoryRequestSerializer, RetrieveCategoryResponseSerializer, UpdateCategoryRequestSerializer
+from src.django_project.permissions import IsAuthenticated
 
 class CategoryViewSet(viewsets.ViewSet):
+    permission_classes = [IsAuthenticated]
     def list(self, request: Request)-> Response:
         order_by = request.query_params.get("order_by", "name")
         page = request.query_params.get("page", 1)

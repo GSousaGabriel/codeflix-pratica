@@ -10,9 +10,9 @@ class SetField(serializers.ListField):
         return list(super().to_representation(value))
 
 class CreateVideoInputSerializer(serializers.ModelSerializer):
-    categories_ids = SetField(child=serializers.UUIDField())
-    genres_ids = SetField(child=serializers.UUIDField())
-    cast_members_ids = SetField(child=serializers.UUIDField())
+    categories = SetField(child=serializers.UUIDField())
+    genres = SetField(child=serializers.UUIDField())
+    cast_members = SetField(child=serializers.UUIDField())
     
     class Meta:
         """Meta"""

@@ -20,10 +20,11 @@ class CreateVideoWithoutMedia:
         launch_year: int
         duration: Decimal
         published: bool
+        opened: bool
         rating: Rating
-        categories_ids: set[UUID]
-        genres_ids: set[UUID]
-        cast_members_ids: set[UUID]
+        categories: set[UUID]
+        genres: set[UUID]
+        cast_members: set[UUID]
         
     @dataclass
     class Output:
@@ -51,10 +52,11 @@ class CreateVideoWithoutMedia:
                 launch_year = input.launch_year,
                 duration = input.duration,
                 published = False,
+                opened = False,
                 rating = input.rating,
-                categories_ids = input.categories_ids,
-                genres_ids = input.genres_ids,
-                cast_members_ids = input.cast_members_ids 
+                categories = input.categories,
+                genres = input.genres,
+                cast_members = input.cast_members 
             )
         except ValueError as e:
             raise InvalidVideo(e)
@@ -65,28 +67,28 @@ class CreateVideoWithoutMedia:
     def validate(self, input: Input) -> None:
         notification = Notification()
         
-        self.validate_categories(input.categories_ids, notification)
-        self.validate_genres(input.genres_ids, notification)
-        self.validate_cast_members(input.cast_members_ids, notification)
+        self.validate_categories(input.categories, notification)
+        self.validate_genres(input.genres, notification)
+        self.validate_cast_members(input.cast_members, notification)
         
         if notification.has_errors:
             raise RelatedEntitiesNotFound(notification.messages)
         
     
     def validate_categories(self, input_categories: set[UUID], notification: Notification) -> None:
-        categories_ids = [category_id.id for category_id in self.category_repo.list()]
+        categories = [category_id.id for category_id in self.category_repo.list()]
         
-        if not input_categories.issubset(categories_ids):
+        if not input_categories.issubset(categories):
             notification.add_error("Categories with provided IDs not found.")
     
     def validate_genres(self, input_genres: set[UUID], notification: Notification) -> None:
-        genres_ids = [genre_id.id for genre_id in self.genre_repo.list()]
+        genres = [genre_id.id for genre_id in self.genre_repo.list()]
         
-        if not input_genres.issubset(genres_ids):
+        if not input_genres.issubset(genres):
             notification.add_error("Genres with provided IDs not found.")
     
     def validate_cast_members(self, input_cast_members: set[UUID], notification: Notification) -> None:
-        cast_members_ids = [cast_member.id for cast_member in self.cast_member_repo.list()]
+        cast_members = [cast_member.id for cast_member in self.cast_member_repo.list()]
         
-        if not input_cast_members.issubset(cast_members_ids):
+        if not input_cast_members.issubset(cast_members):
             notification.add_error("Cast members with provided IDs not found.")

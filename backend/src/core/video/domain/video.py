@@ -1,9 +1,10 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import Decimal
 from uuid import UUID
 
 from src.core._shared.entity import Entity
-from src.core.video.domain.value_objects import AudioVideoMedia, ImageMedia, Rating
+from src.core.video.domain.events.event import AudioVideoMediaUpdated
+from src.core.video.domain.value_objects import AudioVideoMedia, ImageMedia, MediaStatus, MediaType, Rating
 
 @dataclass
 class Video(Entity):
@@ -11,11 +12,12 @@ class Video(Entity):
     description: str
     launch_year: int
     duration: Decimal
-    published: bool
+    opened: bool
     rating: Rating
-    categories_ids: set[UUID]
-    genres_ids: set[UUID]
-    cast_members_ids: set[UUID]
+    categories: set[UUID]
+    genres: set[UUID]
+    cast_members: set[UUID]
+    published: bool = field(default=False)
     banner: ImageMedia | None = None
     thumbnail: ImageMedia | None = None
     thumbnail_half: ImageMedia | None = None
@@ -25,26 +27,36 @@ class Video(Entity):
     def __post_init__(self):
         self.validate()
         
-    def update(self, title, description, launch_year, duration, published, rating):
+    def update(self, title, description, launch_year, duration, published, opened, rating):
         self.title = title
         self.description = description
         self.launch_year = launch_year
         self.duration = duration
         self.published = published
+        self.opened = opened
         self.rating = rating
 
         self.validate()
         
+    def publish(self) -> None:
+        if not self.video:
+            self.notification.add_error("Video media is required to publish the video")
+        elif self.video.status != MediaStatus.COMPLETED:
+            self.notification.add_error("Video must be fully processed to be published")
+
+        self.published = True
+        self.validate()
+        
     def add_category(self, category_id: UUID):
-        self.categories_ids.add(category_id)
+        self.categories.add(category_id)
         self.validate()
         
     def add_genre(self, genre_id: UUID):
-        self.genres_ids.add(genre_id)
+        self.genres.add(genre_id)
         self.validate()
         
     def add_cast_member(self, cast_member: UUID):
-        self.cast_members_ids.add(cast_member)  
+        self.cast_members.add(cast_member)  
         self.validate()
         
     def update_banner(self, banner: ImageMedia):
@@ -63,8 +75,22 @@ class Video(Entity):
         self.trailer = trailer
         self.validate()
         
-    def update_video(self, video: AudioVideoMedia) -> None:
+    def update_video_media(self, video: AudioVideoMedia) -> None:
         self.video = video
+        self.validate()
+        self.dispatch(AudioVideoMediaUpdated(
+            aggregate_id=self.id,
+            file_path=video.raw_location,
+            media_type=MediaType.VIDEO
+        ))
+        
+    def process(self, status: MediaStatus, encoded_location: str = "") -> None:
+        if status == MediaStatus.COMPLETED:
+            self.video = self.video.complete(encoded_location)
+            self.publish()
+        else:
+            self.video = self.video.fail()
+            
         self.validate()
             
     def validate(self):

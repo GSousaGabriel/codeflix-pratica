@@ -56,7 +56,18 @@ class TestCreateVideoWithoutMedia:
         cast_member_repo.list.return_value = [cast_member]
         category_repo.list.return_value = [movie_category]
         
-        input = CreateVideoWithoutMedia.Input("A movie", "Tense movie descripion", 2000, 123.34, True, "ER", set([movie_category.id]), set([drama_genre.id]), set([cast_member.id]))
+        input = CreateVideoWithoutMedia.Input(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=True,
+            opened= True,
+            rating="ER",
+            genres=set([drama_genre.id]),
+            cast_members=set([cast_member.id]),
+            categories=set([movie_category.id])
+        )
         output = use_case.execute(input)
         
         assert isinstance(output.id, UUID)
@@ -76,7 +87,18 @@ class TestCreateVideoWithoutMedia:
         cast_member_repo.list.return_value = [cast_member]
         category_repo.list.return_value = [movie_category]
         
-        input = CreateVideoWithoutMedia.Input("", "Tense movie descripion", 2000, 123.34, True, "ER", set([movie_category.id]), set([drama_genre.id]), set([cast_member.id]))
+        input = CreateVideoWithoutMedia.Input(
+            title = "", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=True,
+            opened= True,
+            rating="ER",
+            genres=set([drama_genre.id]),
+            cast_members=set([cast_member.id]),
+            categories=set([movie_category.id])
+        )
         
         with pytest.raises(InvalidVideo, match="Title cannot be empty."):
             use_case.execute(input)
@@ -96,7 +118,18 @@ class TestCreateVideoWithoutMedia:
         cast_member_repo.list.return_value = [cast_member]
         category_repo.list.return_value = [movie_category]
         
-        input = CreateVideoWithoutMedia.Input("a"*255, "Tense movie descripion", 2000, 123.34, True, "ER", set([movie_category.id]), set([drama_genre.id]), set([cast_member.id]))
+        input = CreateVideoWithoutMedia.Input(
+            title = "a"*255, 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=True,
+            opened= True,
+            rating="ER",
+            genres=set([drama_genre.id]),
+            cast_members=set([cast_member.id]),
+            categories=set([movie_category.id])
+        )
         
         with pytest.raises(InvalidVideo, match="Title cannot be longer than 255 characteres."):
             use_case.execute(input)
@@ -116,7 +149,18 @@ class TestCreateVideoWithoutMedia:
         cast_member_repo.list.return_value = [cast_member]
         category_repo.list.return_value = [movie_category]
         
-        input = CreateVideoWithoutMedia.Input("A title", "Tense movie descripion", 2000, 0, True, "ER", set([movie_category.id]), set([drama_genre.id]), set([cast_member.id]))
+        input = CreateVideoWithoutMedia.Input(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=0,
+            published=True,
+            opened= True,
+            rating="ER",
+            genres=set([drama_genre.id]),
+            cast_members=set([cast_member.id]),
+            categories=set([movie_category.id])
+        )
         
         with pytest.raises(InvalidVideo, match="Duration cannot be 0 or less."):
             use_case.execute(input)
@@ -136,7 +180,18 @@ class TestCreateVideoWithoutMedia:
         cast_member_repo.list.return_value = []
         category_repo.list.return_value = []
         
-        input = CreateVideoWithoutMedia.Input("A movie", "Tense movie descripion", 2000, 123.34, True, "ER", set([movie_category.id]), set([drama_genre.id]), set([cast_member.id]))
+        input = CreateVideoWithoutMedia.Input(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=True,
+            opened= True,
+            rating="ER",
+            genres=set([drama_genre.id]),
+            cast_members=set([cast_member.id]),
+            categories=set([movie_category.id])
+        )
         
         with pytest.raises(RelatedEntitiesNotFound, match="Categories with provided IDs not found.\nGenres with provided IDs not found.\nCast members with provided IDs not found."):
             use_case.execute(input)
@@ -156,7 +211,18 @@ class TestCreateVideoWithoutMedia:
         cast_member_repo.list.return_value = []
         category_repo.list.return_value = [movie_category]
         
-        input = CreateVideoWithoutMedia.Input("A movie", "Tense movie descripion", 2000, 123.34, True, "ER", set([movie_category.id]), set([drama_genre.id]), set([cast_member.id]))
+        input = CreateVideoWithoutMedia.Input(
+            title = "A movie", 
+            description="Tense movie descripion",
+            launch_year=2000, 
+            duration=123.34,
+            published=True,
+            opened= True,
+            rating="ER",
+            genres=set([drama_genre.id]),
+            cast_members=set([cast_member.id]),
+            categories=set([movie_category.id])
+        )
         
         with pytest.raises(RelatedEntitiesNotFound, match="Genres with provided IDs not found.\nCast members with provided IDs not found."):
             use_case.execute(input)
