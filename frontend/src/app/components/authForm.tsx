@@ -9,13 +9,9 @@ type AuthFormProps = {
 };
 
 export default function AuthForm({ formType, onSubmit }: AuthFormProps) {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-  };
-
   return (
     <form
-      onSubmit={handleSubmit}
+      onSubmit={onSubmit}
       className='flex w-full max-w-md flex-col space-y-4 rounded bg-[#141414]/90 px-4 py-8 shadow-lg'
     >
       <div className='flex flex-col items-center space-y-4'>

@@ -24,11 +24,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body
-        className="bg-[#141414] text-white scrollbar-hide"
-      >
-        {children}
-      </body>
+      <body className='scrollbar-hide bg-[#141414] text-white'>{children}</body>
     </html>
   );
 }

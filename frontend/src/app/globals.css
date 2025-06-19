@@ -1,5 +1,8 @@
 @import 'tailwindcss';
 @import 'tailwind-scrollbar-hide/v4';
+@import '@vidstack/react/player/styles/default/theme.css';
+@import '@vidstack/react/player/styles/default/layouts/video.css';
+@config "../../tailwind.config.js";
 
 :root {
   --background: #ffffff;
