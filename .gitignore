@@ -11,3 +11,7 @@
 **/go.sum
 **/.pgdata
 **/bucket-credential.json
+**/coverage/
+**/html/
+**/package.lock.json
+**/__snapshots__/
