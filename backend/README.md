@@ -1,0 +1,1 @@
+In order to run the tests and validate the challenges, run the test `test_update_video_media` in `src/django_project/video_app/tests/test_views.py`. This tests validates both authentication and rabbitmq consumer alone, without the need to run `python manage.py startconsumer` since it's instantiate inside the test itself. 
