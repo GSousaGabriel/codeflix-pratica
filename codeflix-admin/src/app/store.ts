@@ -8,19 +8,19 @@ import { apiSlice } from "../features/api/apiSlice";
 import { castMembersApiSlice } from "../features/cast/castMembersSlice";
 import { categoriesApiSlice } from "../features/categories/categorySlice";
 import { genresApiSlice } from "../features/genres/genresSlice";
+import { uploadReducer } from "../features/uploads/uploadSlice";
 // import { videosSlice } from "../features/videos/VideoSlice";
-// import { uploadReducer } from "../features/uploads/UploadSlice";
-// import { authSlice } from "../features/auth/authSlice";
-// import { uploadQueue } from "../middleware/uploadQueue";
+import { uploadQueue } from "../middleware/uploadQueue";
+import { authSlice } from "../features/auth/authSlice";
 
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   categories: categoriesApiSlice.reducer,
   castMembers: castMembersApiSlice.reducer,
-//   [videosSlice.reducerPath]: videosSlice.reducer,
+  //   [videosSlice.reducerPath]: videosSlice.reducer,
   genres: genresApiSlice.reducer,
-//   auth: authSlice.reducer,
-//   uploadSlice: uploadReducer,
+  auth: authSlice.reducer,
+  uploadSlice: uploadReducer,
 });
 
 export const setupStore = (preloadedState?: Partial<RootState>) => {
@@ -34,7 +34,7 @@ export const setupStore = (preloadedState?: Partial<RootState>) => {
           ignoredPaths: ["uploadSlice.file"],
         },
       })
-        // .prepend(uploadQueue.middleware)
+        .prepend(uploadQueue.middleware)
         .concat(apiSlice.middleware),
   });
 };

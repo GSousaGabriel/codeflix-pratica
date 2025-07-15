@@ -7,7 +7,6 @@ from src.core._shared.events.rabbitmq_dispatcher import RabbitMQDispatcher
 from src.core.video.application.events.handlers import PublishAudioVideoMediaUpdatedHandler
 from src.core.video.application.events.integration_events import AudioVideoMediaUpdatedIntegrationEvent
 
-
 class MessageBus(AbstractMessageBus):
     def __init__(self):
         self.handlers: dict[Type[Event], list[Handler]] = {

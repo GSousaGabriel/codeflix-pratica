@@ -1,3 +1,5 @@
+import threading
+import time
 import pytest
 import os
 from rest_framework.test import APIClient
@@ -6,11 +8,17 @@ from src.core._shared.tests.authentication.jwt_generator import JwtGenerator
 from src.core.castMember.domain.castMember import CastMember
 from src.core.category.domain.category import Category
 from src.core.genre.domain.genre import Genre
+from src.core.video.domain.value_objects import MediaStatus
 from src.core.video.domain.video import Video
+from src.core.video.infra.video_converted_rabbitmq_consumer import VideoConvertedRabbitMQConsumer
 from src.django_project.castMember_app.repository import DjangoORMCastMemberRepository
 from src.django_project.category_app.repository import DjangoORMCategoryRepository
 from src.django_project.genre_app.repository import DjangoORMGenreRepository
 from src.django_project.video_app.repository import DjangoORMVideoRepository
+from django.db import connection
+
+from src.django_project.video_app.tests.test_call_rabbitmq_converter import RabbitMQDispatcherTest
+from src.django_project.video_app.tests.wait_video_update import wait_for_video_update
 
 @pytest.fixture
 def category_documentary() -> Category:
@@ -134,7 +142,7 @@ class TestCreateAPI:
                                     "description": ["This field may not be blank."]
                                 }
 
-@pytest.mark.django_db()   
+@pytest.mark.django_db(transaction=True)   
 class TestUpdateAPI:
     def test_update_video_media(
         self,
@@ -157,6 +165,11 @@ class TestUpdateAPI:
             categories=set()
         )
         video_repo.save(video)
+        connection.commit()
+        consumer = VideoConvertedRabbitMQConsumer(video_repo=video_repo)
+        thread = threading.Thread(target=consumer.start, daemon=True)
+        thread.start()
+        
         url = f"/api/videos/{video.id}/"
         mock_file = SimpleUploadedFile(
             "test_video.mp4",
@@ -169,9 +182,16 @@ class TestUpdateAPI:
             {"video_file": mock_file},
             format="multipart"
         )
+        dispatcher = RabbitMQDispatcherTest()
+        dispatcher.dispatch(str(video.id))
         
         assert response.status_code == 200
-        assert video_repo.get_by_id(video.id).video is not None
+        
+        
+        updated_video = wait_for_video_update(video_repo, video.id)
+
+        assert updated_video is not None
+        assert updated_video.status == MediaStatus.COMPLETED.value
         
     def test_fail_update_video_media_when_can_not_find_video(
         self,

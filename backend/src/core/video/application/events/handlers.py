@@ -10,3 +10,11 @@ class PublishAudioVideoMediaUpdatedHandler(Handler):
     def handle(self, event: Event) -> None:
         print(f"Publishing event {event}")
         self.event_dispatcher.dispatch(event)
+        
+class ConvertAudioVideoMediaUpdatedHandler(Handler):
+    def __init__(self, event_dispatcher: EventDispatcher):
+        self.event_dispatcher = event_dispatcher
+         
+    def handle(self, event: Event) -> None:
+        print(f"Publishing event {event}")
+        self.event_dispatcher.dispatch(event)

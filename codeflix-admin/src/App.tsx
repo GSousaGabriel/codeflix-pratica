@@ -13,6 +13,9 @@ import CreateCastMember from "./features/cast/createCastMember";
 import ListGenres from "./features/genres/listGenres";
 import CreateGenres from "./features/genres/editGenre";
 import EditGenres from "./features/genres/createGenre";
+import { UploadList } from "./features/uploads/uploadList";
+import ProtectedRoute from "./components/protectedRoute";
+import Login from "./components/login";
 
 function App() {
   return (
@@ -30,17 +33,89 @@ function App() {
           }}
         >
           <Layout>
+            <UploadList />
             <Routes>
-              <Route path="/categories" element={<ListCategory />} />
-              <Route path="/categories/create" element={<CreateCategory />} />
-              <Route path="/categories/edit/:id" element={<EditCategory />} />
-              <Route path="/cast-members" element={<ListCastMembers />} />
-              <Route path="/cast-members/create" element={<CreateCastMember />} />
-              <Route path="/cast-members/edit/:id" element={<EditCastMember />} />
-              <Route path="/genres" element={<ListGenres />} />
-              <Route path="/genres/create" element={<CreateGenres />} />
-              <Route path="/genres/edit/:id" element={<EditGenres />} />
-              <Route path="*" element={<p>das</p>} />
+              <Route path="/login" element={<Login />} />
+              <Route
+                path="/categories"
+                element={
+                  <ProtectedRoute>
+                    <ListCategory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/categories/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateCategory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/categories/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <EditCategory />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cast-members"
+                element={
+                  <ProtectedRoute>
+                    <ListCastMembers />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cast-members/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateCastMember />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/cast-members/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <EditCastMember />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/genres"
+                element={
+                  <ProtectedRoute>
+                    <ListGenres />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/genres/create"
+                element={
+                  <ProtectedRoute>
+                    <CreateGenres />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/genres/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <EditGenres />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="*"
+                element={
+                  <ProtectedRoute>
+                    <p>das</p>
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </Layout>
         </Box>

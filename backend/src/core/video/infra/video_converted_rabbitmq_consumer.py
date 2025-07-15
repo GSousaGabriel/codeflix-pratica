@@ -13,11 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 class VideoConvertedRabbitMQConsumer(AbstractConsumer):
-    def __init__(self, host='localhost', queue='videos.converted'):
+    def __init__(self, host='localhost', queue='videos.converted', video_repo=None):
         self.host = host
         self.queue = queue
         self.connection = None
         self.channel = None
+        self.video_repo = video_repo or DjangoORMVideoRepository()
 
     def on_message(self, message: bytes):
         print(f"Received message: {message}")
@@ -47,7 +48,7 @@ class VideoConvertedRabbitMQConsumer(AbstractConsumer):
                 status=status,
             )
             print("Calling use case with input", process_audio_video_media_input)
-            use_case = ProcessAudioVideoMedia(video_repository=DjangoORMVideoRepository())
+            use_case = ProcessAudioVideoMedia(video_repository=self.video_repo)
             use_case.execute(request=process_audio_video_media_input)
         except Exception as e:
             logger.error(f"Error processing payload {message}", exc_info=True)

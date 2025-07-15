@@ -46,6 +46,6 @@ class UploadVideo:
         video.update_video_media(audio_video_media)
         self.video_repo.update(video)
         self.message_bus.handle([AudioVideoMediaUpdatedIntegrationEvent(
-            resource_id=f"{video.id}.{MediaType.VIDEO}",
+            resource_id=f"{video.id}.{MediaType.VIDEO.value}",
             file_path=str(file_path)
         )])

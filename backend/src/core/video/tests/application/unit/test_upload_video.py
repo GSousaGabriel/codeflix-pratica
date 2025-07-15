@@ -3,7 +3,7 @@ from unittest.mock import create_autospec
 import pytest
 from src.core._shared.events.message_bus import MessageBus
 from src.core._shared.storage.abstract_storage_service import AbstractStorageService
-from src.core.video.application.events.integration_events import AudioVideoMediaUpdatedIntegrationEvent
+from src.core.video.application.events.integration_events import AudioVideoMediaUpdatedIntegrationEvent, VideoToConvert
 from src.core.video.application.use_cases.exceptions import InvalidVideo
 from src.core.video.application.use_cases.upload_video import UploadVideo
 from src.core.video.domain.value_objects import AudioVideoMedia, MediaStatus, MediaType
@@ -54,7 +54,7 @@ class TestUploadVideo:
         )
         mock_message_bus.handle.assert_called_once_with([
             AudioVideoMediaUpdatedIntegrationEvent(
-                resource_id=f"{video.id}.{MediaType.VIDEO}",
+                resource_id=f"{video.id}.{MediaType.VIDEO.value}",
                 file_path=f"videos/{video.id}/video.mp4"
             )
         ])

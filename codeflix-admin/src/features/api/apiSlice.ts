@@ -1,11 +1,19 @@
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { keycloak } from "../../keycloakConfig";
 
-
-const baseUrl = "http://localhost:8000/api"
+export const baseUrl = "http://localhost:8000/api";
 
 export const apiSlice = createApi({
-    reducerPath: "api",
-    tagTypes: ["Categories", "CastMembers", "Genres"],
-    endpoints: ()=>({}),
-    baseQuery: fetchBaseQuery({baseUrl})
-})
+  reducerPath: "api",
+  tagTypes: ["Categories", "CastMembers", "Genres"],
+  endpoints: () => ({}),
+  baseQuery: fetchBaseQuery({
+    baseUrl,
+    prepareHeaders: (headers) => {
+      if (keycloak.token) {
+        headers.set("Authorization", `Bearer ${keycloak.token}`);
+      }
+      return headers;
+    },
+  }),
+});
