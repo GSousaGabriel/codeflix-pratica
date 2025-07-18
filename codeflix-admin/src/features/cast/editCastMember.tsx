@@ -31,11 +31,11 @@ const EditCastMember = () => {
 
   useEffect(() => {
     if (status.isSuccess) {
-      enqueueSnackbar("CastMember updated successfully", {
+      enqueueSnackbar("Cast member updated successfully", {
         variant: "success",
       });
     } else {
-      enqueueSnackbar("CastMember not updated", { variant: "error" });
+      enqueueSnackbar("Cast member not updated", { variant: "error" });
     }
   }, [status]);
 

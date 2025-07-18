@@ -55,7 +55,7 @@ const EditCategory = () => {
         </Box>
       </Paper>
       <CategoryForm
-        category={category}
+        category={categoryState}
         isDisabled={status.isLoading}
         isLoading={isFetching || status.isLoading}
         onSubmit={handleSubmit}

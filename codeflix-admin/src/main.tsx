@@ -11,12 +11,12 @@ const store = setupStore();
 
 createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
-    <KeycloackProvider>
-      <StrictMode>
-        <BrowserRouter>
-          <App />
-        </BrowserRouter>
-      </StrictMode>
-    </KeycloackProvider>
+      <KeycloackProvider>
+        <StrictMode>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </StrictMode>
+      </KeycloackProvider>
   </Provider>
 );

@@ -9,15 +9,15 @@ import { castMembersApiSlice } from "../features/cast/castMembersSlice";
 import { categoriesApiSlice } from "../features/categories/categorySlice";
 import { genresApiSlice } from "../features/genres/genresSlice";
 import { uploadReducer } from "../features/uploads/uploadSlice";
-// import { videosSlice } from "../features/videos/VideoSlice";
 import { uploadQueue } from "../middleware/uploadQueue";
 import { authSlice } from "../features/auth/authSlice";
+import { videoApiSlice } from "../features/videos/videoSlice";
 
 const rootReducer = combineReducers({
   [apiSlice.reducerPath]: apiSlice.reducer,
   categories: categoriesApiSlice.reducer,
   castMembers: castMembersApiSlice.reducer,
-  //   [videosSlice.reducerPath]: videosSlice.reducer,
+  videos: videoApiSlice.reducer,
   genres: genresApiSlice.reducer,
   auth: authSlice.reducer,
   uploadSlice: uploadReducer,

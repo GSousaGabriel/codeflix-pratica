@@ -40,6 +40,7 @@ const CategoryForm = ({
               value={category.name}
               disabled={isDisabled}
               onChange={changeHandler}
+              data-testid="name"
             />
             <TextField
               required
@@ -48,11 +49,13 @@ const CategoryForm = ({
               value={category.description}
               disabled={isDisabled}
               onChange={changeHandler}
+              data-testid="description"
             />
             <FormControlLabel
               label="Active"
               control={
                 <Switch
+                  data-testid="is_active"
                   name="is_active"
                   color="secondary"
                   onChange={toggleHandler}

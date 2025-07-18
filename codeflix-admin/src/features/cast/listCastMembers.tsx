@@ -10,13 +10,12 @@ import {
 import CastMembersTable from "./components/castMemberTable";
 
 const ListCastMembers = () => {
-  const initialOptions = {
+  const [options, setOptions] = useState({
     perPage: 10,
     search: "",
     page: 1,
     rowsPerPage: [10, 20, 30],
-  };
-  const [options, setOptions] = useState(initialOptions);
+  });
   const { enqueueSnackbar } = useSnackbar();
   const { data, isFetching, error } = useGetCastMembersQuery(options);
   const [deleteCastMember, deleteCastMemberStatus] =
@@ -62,7 +61,7 @@ const ListCastMembers = () => {
   }, [deleteCastMemberStatus, error]);
 
   if (error) {
-    return <Typography>Error fetching castMembers</Typography>;
+    return <Typography>Error fetching cast members.</Typography>;
   }
 
   return (

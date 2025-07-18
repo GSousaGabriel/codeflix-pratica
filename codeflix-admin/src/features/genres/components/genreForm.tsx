@@ -36,8 +36,8 @@ const GenreForm = ({
             <TextField
               required
               name="name"
-              label="Name"
               data-testid="name"
+              label="Name"
               value={genre.name}
               disabled={isDisabled}
               onChange={changeHandler}

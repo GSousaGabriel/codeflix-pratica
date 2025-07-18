@@ -10,6 +10,7 @@ import {
   useUpdateGenreMutation,
 } from "./genresSlice";
 import GenreForm from "./components/genreForm";
+import { mapGenreToForm } from "./utils/util";
 
 const EditGenre = () => {
   const id = useParams().id || "";
@@ -40,11 +41,7 @@ const EditGenre = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await updateGenre({
-      id: genreState.id,
-      name: genreState.name,
-      categories_id: genreState.categories?.map((category) => category.id),
-    });
+    await updateGenre(mapGenreToForm(genreState));
   };
 
   return (

@@ -8,6 +8,7 @@ import {
   useGetCategoriesQuery,
 } from "./genresSlice";
 import GenreForm from "./components/genreForm";
+import { mapGenreToForm } from "./utils/util";
 
 const CreateGenre = () => {
   const [createGenre, status] = useCreateGenreMutation();
@@ -22,11 +23,7 @@ const CreateGenre = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await createGenre({
-      id: genreState.id,
-      name: genreState.name,
-      categories_id: genreState.categories?.map((category) => category.id),
-    });
+    await createGenre(mapGenreToForm(genreState));
   };
 
   useEffect(() => {

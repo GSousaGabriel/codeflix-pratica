@@ -41,6 +41,7 @@ const CastMemberForm = ({
               value={castMember.name}
               disabled={isDisabled}
               onChange={changeHandler}
+              data-testid="name"
             />
             <RadioGroup
               aria-labelledby="type"
@@ -61,7 +62,7 @@ const CastMemberForm = ({
         </Grid>
         <Grid>
           <Box display="flex" gap={2}>
-            <Button variant="contained" component={Link} to="/categories">
+            <Button variant="contained" component={Link} to="/cast-members">
               Back
             </Button>
             <Button

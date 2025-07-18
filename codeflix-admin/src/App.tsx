@@ -1,7 +1,6 @@
 import "./App.css";
-import { Box, ThemeProvider } from "@mui/material";
+import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import Layout from "./components/layout";
-import appTheme from "./config/theme";
 import { Route, Routes } from "react-router";
 import ListCategory from "./features/categories/listCategory";
 import EditCategory from "./features/categories/editCategory";
@@ -16,10 +15,14 @@ import EditGenres from "./features/genres/createGenre";
 import { UploadList } from "./features/uploads/uploadList";
 import ProtectedRoute from "./components/protectedRoute";
 import Login from "./components/login";
+import VideosList from "./features/videos/videoList";
+import VideoCreate from "./features/videos/videoCreate";
+import VideoEdit from "./features/videos/videoEdit";
 
 function App() {
   return (
-    <ThemeProvider theme={appTheme}>
+    <ThemeProvider theme={{ palette: { mode: "dark" } }}>
+      <CssBaseline />
       <SnackbarProvider
         maxSnack={3}
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
@@ -105,6 +108,31 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <EditGenres />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/videos"
+                element={
+                  <ProtectedRoute>
+                    <VideosList />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/videos/create"
+                element={
+                  <ProtectedRoute>
+                    <VideoCreate />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/videos/edit/:id"
+                element={
+                  <ProtectedRoute>
+                    <VideoEdit />
                   </ProtectedRoute>
                 }
               />

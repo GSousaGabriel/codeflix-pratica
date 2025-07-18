@@ -34,7 +34,7 @@ const CreateCastMember = () => {
 
   useEffect(() => {
     if (status.isSuccess) {
-      enqueueSnackbar("Cast member create successfully", {
+      enqueueSnackbar("Cast member created successfully", {
         variant: "success",
       });
     } else if (status.isError) {
