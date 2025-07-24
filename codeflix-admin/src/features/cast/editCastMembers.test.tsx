@@ -17,7 +17,7 @@ const cast_member = {
 export const handlers = [
   http.get(`${baseUrl}/cast_members/`, async () => {
     await delay(150);
-    return HttpResponse.json(cast_member, { status: 200 });
+    return HttpResponse.json({data: cast_member}, { status: 200 });
   }),
   http.put(`${baseUrl}/cast_members/:id`, async () => {
     await delay(150);
