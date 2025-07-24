@@ -1,6 +1,6 @@
 import ArticleIcon from "@mui/icons-material/Article";
 import { Box, ListItem, Typography } from "@mui/material";
-import type { UploadState } from "./uploadSlice";
+import type { UploadState } from "../uploadSlice";
 import { UploadStatus } from "./uploadStatus";
 
 type Props = {

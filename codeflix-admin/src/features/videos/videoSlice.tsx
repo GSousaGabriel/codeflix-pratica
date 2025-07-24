@@ -126,7 +126,7 @@ export const videoApiSlice = apiSlice.injectEndpoints({
       query: (video) => updateVideo(video),
       invalidatesTags: ["Videos"],
     }),
-    createVideo: builder.mutation<void, VideoPayload>({
+    createVideo: builder.mutation<Result, VideoPayload>({
       query: (video) => createVideo(video),
       invalidatesTags: ["Videos"],
     }),

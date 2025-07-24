@@ -39,7 +39,7 @@ const CastMembersTable = ({
       id: castMember.id,
       name: castMember.name,
       type: castMember.type,
-      createdAt: new Date(castMember.created_at).toLocaleDateString(""),
+      createdAt: new Date(castMember.created_at).toLocaleDateString(),
     }));
   };
 

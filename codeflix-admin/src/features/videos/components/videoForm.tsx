@@ -15,6 +15,7 @@ import { Link } from "react-router";
 import { AutoCompleteFields } from "../../../components/autoCompleteFields";
 import type { FormEvent, ChangeEvent } from "react";
 import { RatingsList } from "../../../components/ratingList";
+import InputFile from "../../../components/inputFile";
 
 type Props = {
   video: Video;
@@ -25,8 +26,8 @@ type Props = {
   isLoading?: boolean;
   onSubmit: (e: FormEvent<HTMLFormElement>) => void;
   changeHandler: (e: ChangeEvent<HTMLInputElement>) => void;
-  handleAddFile: ({ name, file }: FileObject) => void;
-  handleRemoveFile: (name: string) => void;
+  addFileHandler: ({ name, file }: FileObject) => void;
+  deleteFileHandler: (name: string) => void;
 };
 
 export default function VideosForm({
@@ -38,39 +39,39 @@ export default function VideosForm({
   isLoading = false,
   onSubmit,
   changeHandler,
-  handleAddFile,
-  handleRemoveFile,
+  addFileHandler,
+  deleteFileHandler,
 }: Props) {
   const handleAddThumbnail = (file: File) => {
-    handleAddFile({ name: "thumb_file", file });
+    addFileHandler({ name: "thumb_file", file });
   };
 
   const handleRemoveThumbnail = () => {
-    handleRemoveFile("thumb_file");
+    deleteFileHandler("thumb_file");
   };
 
   const handleAddBanner = (file: File) => {
-    handleAddFile({ name: "banner_file", file });
+    addFileHandler({ name: "banner_file", file });
   };
 
   const handleAddTrailer = (file: File) => {
-    handleAddFile({ name: "trailer_file", file });
+    addFileHandler({ name: "trailer_file", file });
   };
 
   const handleAddVideo = (file: File) => {
-    handleAddFile({ name: "video_file", file });
+    addFileHandler({ name: "video_file", file });
   };
 
   const handleRemoveBanner = () => {
-    handleRemoveFile("banner_file");
+    deleteFileHandler("banner_file");
   };
 
   const handleRemoveTrailer = () => {
-    handleRemoveFile("trailer_file");
+    deleteFileHandler("trailer_file");
   };
 
   const handleRemoveVideo = () => {
-    handleRemoveFile("video_file");
+    deleteFileHandler("video_file");
   };
 
   return (

@@ -41,7 +41,7 @@ const CastMemberForm = ({
               value={castMember.name}
               disabled={isDisabled}
               onChange={changeHandler}
-              data-testid="name"
+              slotProps={{ htmlInput: { "data-testid": "name" } }}
             />
             <RadioGroup
               aria-labelledby="type"

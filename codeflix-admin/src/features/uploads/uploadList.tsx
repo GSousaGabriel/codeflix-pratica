@@ -10,13 +10,13 @@ import {
 import { Box } from "@mui/system";
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
-import { UploadItem } from "./components/UploadItem";
 import {
   cleanAllUploads,
   cleanFinishedUploads,
   selectUploads,
 } from "./uploadSlice";
 import { useState } from "react";
+import { UploadItem } from "./components/uploadItem";
 
 type Upload = {
   name: string;

@@ -5,30 +5,35 @@ import { useSnackbar } from "notistack";
 import {
   initialState,
   useGetAllCastMembersQuery,
-  useGetAllCategoriesQuery,
   useGetAllGenresQuery,
   useGetVideoQuery,
   useUpdateVideoMutation,
 } from "./videoSlice";
-import type { Video } from "../../types/videos";
+import type { FileObject, Video } from "../../types/videos";
 import VideoForm from "./components/videoForm";
 import { mapVideoToForm } from "./utils/utils";
+import { useUniqueCategories } from "../../hooks/useUniqueCategories";
 
 const VideosEdit = () => {
   const id = useParams().id || "";
   const { data: video, isFetching } = useGetVideoQuery({ id });
-  const { data: categories } = useGetAllCategoriesQuery();
   const { data: castMembers } = useGetAllCastMembersQuery();
   const { data: genres } = useGetAllGenresQuery();
   const [updateVideo, status] = useUpdateVideoMutation();
   const [videoState, setVideoState] = useState<Video>(initialState);
   const { enqueueSnackbar } = useSnackbar();
+  const [categories, setCategories] = useUniqueCategories(
+    videoState,
+    setVideoState
+  );
+  const [selectedFiles, setSelectedFiles] = useState<FileObject[]>([]);
 
   useEffect(() => {
     if (video) {
       setVideoState(video.data);
+      setCategories(video.data.categories || []);
     }
-  }, [video]);
+  }, [video, setCategories]);
 
   useEffect(() => {
     if (status.isSuccess) {
@@ -51,6 +56,14 @@ const VideosEdit = () => {
     enqueueSnackbar("Update was successful", { variant: "success" });
   };
 
+  const addFileHandler = ({ name, file }: FileObject) => {
+    setSelectedFiles([...selectedFiles, { name, file }]);
+  };
+
+  const deleteFileHandler = (name: string) => {
+    setSelectedFiles(selectedFiles.filter((file) => file.name !== name));
+  };
+
   return (
     <Box>
       <Paper>
@@ -62,11 +75,13 @@ const VideosEdit = () => {
         video={videoState}
         isDisabled={status.isLoading}
         isLoading={isFetching || status.isLoading}
-        categories={categories?.data}
+        categories={categories}
         castMembers={castMembers?.data}
         genres={genres?.data}
         onSubmit={handleSubmit}
         changeHandler={changeHandler}
+        addFileHandler={addFileHandler}
+        deleteFileHandler={deleteFileHandler}
       />
     </Box>
   );

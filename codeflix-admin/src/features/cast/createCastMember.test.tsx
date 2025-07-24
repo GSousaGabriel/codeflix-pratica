@@ -4,6 +4,7 @@ import { baseUrl } from "../api/apiSlice";
 import { delay, http, HttpResponse } from "msw";
 import { setupServer } from "msw/node";
 import CreateCastMember from "./createCastMember";
+import '@testing-library/jest-dom';
 
 export const handlers = [
   http.post(`${baseUrl}/cast_members`, async () => {

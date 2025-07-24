@@ -1,5 +1,15 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import updateVideo from "./uploadThunk";
+import type { RootState } from "../../app/store";
+
+export const STATUS = {
+  IDDLE: "idle",
+  LOADING: "loading",
+  SUCCESS: "success",
+  FAILED: "failed",
+} as const;
+
+export type Status = (typeof STATUS)[keyof typeof STATUS];
 
 export interface UploadState {
   id: string;
@@ -29,6 +39,16 @@ const UploadSlice = createSlice({
       if (index !== -1) {
         state.splice(index, 1);
       }
+    },
+    cleanAllUploads() {
+      return [];
+    },
+    cleanFinishedUploads(state) {
+      const uploads = state.filter(
+        (upload) => upload.status !== "success" && upload.status !== "fail"
+      );
+      state.splice(0, state.length);
+      state.push(...uploads);
     },
     setUploadProgress(state, action: PayloadAction<UploadProgress>) {
       const { id, progress } = action.payload;
@@ -60,6 +80,13 @@ const UploadSlice = createSlice({
   },
 });
 
-export const { addUpload, removeUpload, setUploadProgress } =
-  UploadSlice.actions;
+export const {
+  addUpload,
+  removeUpload,
+  cleanFinishedUploads,
+  cleanAllUploads,
+  setUploadProgress,
+} = UploadSlice.actions;
+
+export const selectUploads = (state: RootState) => state.uploadSlice;
 export const uploadReducer = UploadSlice.reducer;

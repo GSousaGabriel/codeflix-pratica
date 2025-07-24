@@ -15,7 +15,7 @@ const cast_member = {
 };
 
 export const handlers = [
-  http.get(`${baseUrl}/cast_members/undefined`, async () => {
+  http.get(`${baseUrl}/cast_members/`, async () => {
     await delay(150);
     return HttpResponse.json(cast_member, { status: 200 });
   }),

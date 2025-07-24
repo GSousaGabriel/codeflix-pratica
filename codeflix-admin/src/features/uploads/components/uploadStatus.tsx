@@ -2,6 +2,7 @@ import React from "react";
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { CircularProgress } from "@mui/material";
+import { STATUS, type Status } from "./uploadSlice";
 
 interface Props {
   status?: Status;

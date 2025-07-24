@@ -2,9 +2,10 @@ import { render, screen } from "@testing-library/react";
 import '@testing-library/jest-dom';
 import { Header } from "./Header";
 import { keycloak } from "../keycloakConfig";
+import { vi } from "vitest";
 
 // mock keycloak
-jest.mock("../keycloakConfig");
+vi.mock("../keycloakConfig");
 
 describe("Header", () => {
   it("should render correctly", () => {
